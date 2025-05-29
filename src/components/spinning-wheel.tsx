@@ -2,7 +2,7 @@
 "use client";
 
 import type { LucideIcon } from "lucide-react";
-import { Award, Gem, Gift, Star, ThumbsUp, Coins, Triangle, Frown } from "lucide-react"; // Added ThumbsUp, Coins, Frown
+import { Award, Gem, Gift, Star, ThumbsUp, Coins, Triangle, Frown } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,13 +19,21 @@ interface Prize {
   textColor: string; // HSL string for text fill
 }
 
+// Probabilities:
+// Sweets: 0.30
+// ₹100: 0.10
+// ₹20: 0.05
+// ₹50: 0.05
+// ₹10: 0.10
+// Better Luck Next Time: 0.40
+// Total: 1.00
 const initialPrizes: Prize[] = [
-  { id: 'sweets', name: 'Sweets', displayName: 'Sweets', icon: Gift, probability: 0.198, color: 'hsl(320, 70%, 75%)', textColor: 'hsl(0, 0%, 10%)' },
-  { id: '100_rupees', name: '100 Rupees', displayName: '₹100', icon: Award, probability: 0.01, color: 'hsl(51, 100%, 60%)', textColor: 'hsl(0, 0%, 10%)' },
-  { id: '20_rupees', name: '20 Rupees', displayName: '₹20', icon: Gem, probability: 0.198, color: 'hsl(190, 70%, 70%)', textColor: 'hsl(0, 0%, 10%)' },
-  { id: '50_rupees', name: '50 Rupees', displayName: '₹50', icon: Star, probability: 0.198, color: 'hsl(140, 60%, 65%)', textColor: 'hsl(0, 0%, 10%)' },
-  { id: '10_rupees', name: '10 Rupees', displayName: '₹10', icon: Coins, probability: 0.198, color: 'hsl(210, 70%, 75%)', textColor: 'hsl(0, 0%, 10%)' },
-  { id: 'no_prize', name: 'Better Luck Next Time', displayName: 'Better Luck Next Time', icon: ThumbsUp, probability: 0.198, color: 'hsl(220, 15%, 70%)', textColor: 'hsl(0, 0%, 10%)' },
+  { id: 'sweets', name: 'Sweets', displayName: 'Sweets', icon: Gift, probability: 0.30, color: 'hsl(320, 70%, 75%)', textColor: 'hsl(0, 0%, 10%)' },
+  { id: '100_rupees', name: '100 Rupees', displayName: '₹100', icon: Award, probability: 0.10, color: 'hsl(51, 100%, 60%)', textColor: 'hsl(0, 0%, 10%)' },
+  { id: '20_rupees', name: '20 Rupees', displayName: '₹20', icon: Gem, probability: 0.05, color: 'hsl(190, 70%, 70%)', textColor: 'hsl(0, 0%, 10%)' },
+  { id: '50_rupees', name: '50 Rupees', displayName: '₹50', icon: Star, probability: 0.05, color: 'hsl(140, 60%, 65%)', textColor: 'hsl(0, 0%, 10%)' },
+  { id: '10_rupees', name: '10 Rupees', displayName: '₹10', icon: Coins, probability: 0.10, color: 'hsl(210, 70%, 75%)', textColor: 'hsl(0, 0%, 10%)' },
+  { id: 'no_prize', name: 'Better Luck Next Time', displayName: 'Better Luck Next Time', icon: ThumbsUp, probability: 0.40, color: 'hsl(220, 15%, 70%)', textColor: 'hsl(0, 0%, 10%)' },
 ];
 
 const WHEEL_SIZE = 360; // SVG viewBox size
@@ -33,20 +41,21 @@ const WHEEL_CENTER = WHEEL_SIZE / 2;
 const WHEEL_RADIUS = WHEEL_SIZE / 2 - 20; // Radius for segments
 const ICON_SIZE = 24;
 const SPIN_DURATION_MS = 5000; // 5 seconds
-const LOCAL_STORAGE_KEY = 'perunnalSpinnerHasSpun';
+const LOCAL_STORAGE_KEY_HAS_SPUN = 'perunnalSpinnerHasSpun';
+const LOCAL_STORAGE_KEY_RUPEES_100_WINS = 'perunnalSpinnerRupees100Wins';
 
 export function SpinningWheel() {
   const [isSpinning, setIsSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
   const [currentPrize, setCurrentPrize] = useState<Prize | null>(null);
   const [hasSpun, setHasSpun] = useState(false);
-  const [hasMounted, setHasMounted] = useState(false); // For hydration fix
+  const [hasMounted, setHasMounted] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
-    setHasMounted(true); // Component has mounted on client
+    setHasMounted(true); 
 
-    const alreadySpun = localStorage.getItem(LOCAL_STORAGE_KEY);
+    const alreadySpun = localStorage.getItem(LOCAL_STORAGE_KEY_HAS_SPUN);
     if (alreadySpun === 'true') {
       setHasSpun(true);
     }
@@ -56,7 +65,7 @@ export function SpinningWheel() {
   const segmentAngle = 360 / numSegments;
 
   const getPathD = (index: number) => {
-    const startAngleRad = (segmentAngle * index - 90) * (Math.PI / 180); // -90 to start from top
+    const startAngleRad = (segmentAngle * index - 90) * (Math.PI / 180); 
     const endAngleRad = (segmentAngle * (index + 1) - 90) * (Math.PI / 180);
 
     const x1 = WHEEL_CENTER + WHEEL_RADIUS * Math.cos(startAngleRad);
@@ -73,14 +82,11 @@ export function SpinningWheel() {
     const angleRad = (segmentAngle * (index + 0.5) - 90) * (Math.PI / 180);
     const textRadius = WHEEL_RADIUS * 0.65;
     let fontSize = 14;
-    // Adjust font size for longer text, especially "Better Luck Next Time"
     if (initialPrizes[index].id === 'no_prize') {
         fontSize = 9;
     } else if (initialPrizes[index].displayName.length > 10) {
         fontSize = 10;
     }
-
-
     return {
       x: WHEEL_CENTER + textRadius * Math.cos(angleRad),
       y: WHEEL_CENTER + textRadius * Math.sin(angleRad),
@@ -91,7 +97,7 @@ export function SpinningWheel() {
 
   const getIconPosition = (index: number) => {
     const angleRad = (segmentAngle * (index + 0.5) - 90) * (Math.PI / 180);
-    const iconRadius = WHEEL_RADIUS * 0.85; // Position icons closer to the edge
+    const iconRadius = WHEEL_RADIUS * 0.85;
     return {
       x: WHEEL_CENTER + iconRadius * Math.cos(angleRad) - ICON_SIZE / 2,
       y: WHEEL_CENTER + iconRadius * Math.sin(angleRad) - ICON_SIZE / 2,
@@ -108,7 +114,6 @@ export function SpinningWheel() {
         return prize;
       }
     }
-    // Fallback, should not happen if probabilities sum to 1
     return initialPrizes[initialPrizes.length - 1];
   };
 
@@ -118,31 +123,54 @@ export function SpinningWheel() {
     setIsSpinning(true);
     setCurrentPrize(null);
 
-    const winner = determineWinner();
-    const winnerIndex = initialPrizes.findIndex(p => p.id === winner.id);
+    let determinedWinner = determineWinner();
+    let actualWinner = determinedWinner; 
 
-    const targetAngle = - (winnerIndex * segmentAngle + segmentAngle / 2); // Center of the segment
-    const randomSpins = Math.floor(Math.random() * 3) + 3; // 3 to 5 full spins
+    // Client-side check for ₹100 win limit
+    // Note: This is not a robust global limit. A true global limit requires a backend.
+    if (determinedWinner.id === '100_rupees') {
+      const winCountStr = localStorage.getItem(LOCAL_STORAGE_KEY_RUPEES_100_WINS);
+      let winCount = parseInt(winCountStr || '0', 10);
+      if (isNaN(winCount)) winCount = 0;
+
+      if (winCount < 2) {
+        winCount++;
+        localStorage.setItem(LOCAL_STORAGE_KEY_RUPEES_100_WINS, winCount.toString());
+        // actualWinner remains determinedWinner (i.e., 100_rupees)
+      } else {
+        // Limit reached, change prize to "Better Luck Next Time"
+        const betterLuckPrize = initialPrizes.find(p => p.id === 'no_prize');
+        if (betterLuckPrize) {
+            actualWinner = betterLuckPrize;
+        }
+        // If 'no_prize' somehow isn't found, actualWinner remains determinedWinner,
+        // but this shouldn't happen with the current setup.
+      }
+    }
+
+    const winnerIndex = initialPrizes.findIndex(p => p.id === actualWinner.id);
+    const targetAngle = - (winnerIndex * segmentAngle + segmentAngle / 2);
+    const randomSpins = Math.floor(Math.random() * 3) + 3; 
     const finalRotation = rotation + (360 * randomSpins) + targetAngle - (rotation % 360);
 
     setRotation(finalRotation);
 
     setTimeout(() => {
       setIsSpinning(false);
-      setCurrentPrize(winner);
+      setCurrentPrize(actualWinner);
       setHasSpun(true);
-      localStorage.setItem(LOCAL_STORAGE_KEY, 'true');
+      localStorage.setItem(LOCAL_STORAGE_KEY_HAS_SPUN, 'true');
 
-      if (winner.id === '100_rupees') {
+      if (actualWinner.id === '100_rupees') {
          toast({
             title: "🎉 Congratulations! 🎉",
             description: "You won 100 Rupees!",
             variant: "default",
           });
-      } else if (winner.id !== 'no_prize') {
+      } else if (actualWinner.id !== 'no_prize') {
          toast({
             title: "You won!",
-            description: `You got ${winner.name}!`,
+            description: `You got ${actualWinner.name}!`,
           });
       } else {
          toast({
@@ -155,7 +183,6 @@ export function SpinningWheel() {
   };
 
   if (!hasMounted) {
-    // Render a simple placeholder to avoid SVG rendering on server/pre-hydration
     return (
       <Card className="w-full max-w-md mx-auto shadow-2xl bg-card">
         <CardHeader className="text-center">
@@ -168,7 +195,7 @@ export function SpinningWheel() {
               width: `${WHEEL_SIZE}px`,
               height: `${WHEEL_SIZE}px`,
               border: '8px solid hsl(var(--primary))',
-              backgroundColor: 'hsl(var(--muted))', // Use a muted background for placeholder
+              backgroundColor: 'hsl(var(--muted))', 
             }}
           >
             <p className="text-muted-foreground">Loading Wheel...</p>
@@ -222,7 +249,7 @@ export function SpinningWheel() {
                     <text
                       x={textX}
                       y={textY}
-                      dy=".3em" // vertical centering
+                      dy=".3em"
                       textAnchor="middle"
                       fontSize={textFontSize}
                       fontWeight="bold"
