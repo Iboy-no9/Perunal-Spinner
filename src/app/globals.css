@@ -4,10 +4,10 @@
 
 @layer base {
   :root {
-    --background: 54 56% 81%; /* #F0E68C Muted Gold */
-    --foreground: 45 30% 20%; /* Darker Brown for better contrast on Muted Gold */
+    --background: 0 0% 100%; /* White */
+    --foreground: 45 30% 20%; /* Darker Brown for better contrast on White */
 
-    --card: 54 56% 81%; /* Card background same as main background */
+    --card: 0 0% 100%; /* Card background same as main background (White) */
     --card-foreground: 45 30% 20%; /* Card foreground same as main foreground */
 
     --popover: 0 0% 100%;
@@ -28,8 +28,8 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 54 40% 75%; /* Slightly darker Muted Gold for borders */
-    --input: 54 40% 75%; /* Input border same as general border */
+    --border: 54 40% 75%; /* Slightly darker Muted Gold for borders (might be subtle on white) */
+    --input: 54 40% 75%; /* Input border same as general border (might be subtle on white) */
     --ring: 51 100% 50%; /* Festive Gold for focus rings */
 
     --chart-1: 12 76% 61%;
