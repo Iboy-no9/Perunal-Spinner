@@ -22,10 +22,10 @@ export default function LisanIntroPage() {
         <CardContent className="space-y-6">
           <div className="aspect-video w-full relative overflow-hidden rounded-lg shadow-md">
             <Image
-              src="https://storage.googleapis.com/project-sparky-firebase-testing/temp-assets/lisan-logo.png"
+              src="https://v6xrx50k-3000.inc1.devtunnels.ms/images/lisan%20logo%20new.png"
               alt="Lisan Students Union Logo"
               layout="fill"
-              objectFit="contain" // Changed to contain to show the full logo better
+              objectFit="contain"
               data-ai-hint="student union logo"
               className="rounded-lg"
             />

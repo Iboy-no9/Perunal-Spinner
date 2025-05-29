@@ -23,6 +23,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'v6xrx50k-3000.inc1.devtunnels.ms', // Added new hostname
+        port: '',
+        pathname: '/**',
+      }
     ],
   },
 };
