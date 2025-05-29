@@ -24,7 +24,7 @@ const initialPrizes: Prize[] = [
   { id: '100_rupees', name: '100 Rupees', displayName: '₹100', icon: Award, probability: 0.10, color: 'hsl(51, 100%, 60%)', textColor: 'hsl(0, 0%, 10%)' },
   { id: '20_rupees', name: '20 Rupees', displayName: '₹20', icon: Gem, probability: 0.225, color: 'hsl(190, 70%, 70%)', textColor: 'hsl(0, 0%, 10%)' },
   { id: '50_rupees', name: '50 Rupees', displayName: '₹50', icon: Star, probability: 0.225, color: 'hsl(140, 60%, 65%)', textColor: 'hsl(0, 0%, 10%)' },
-  { id: 'no_prize', name: 'No Prize', displayName: 'No Prize', icon: XCircle, probability: 0.225, color: 'hsl(220, 15%, 70%)', textColor: 'hsl(0, 0%, 10%)' },
+  { id: 'no_prize', name: 'Better Luck Next Time', displayName: 'Better Luck Next Time', icon: XCircle, probability: 0.225, color: 'hsl(220, 15%, 70%)', textColor: 'hsl(0, 0%, 10%)' },
 ];
 
 const WHEEL_SIZE = 360; // SVG viewBox size
@@ -74,10 +74,17 @@ export function SpinningWheel() {
   const getTextPosition = (index: number) => {
     const angleRad = (segmentAngle * (index + 0.5) - 90) * (Math.PI / 180);
     const textRadius = WHEEL_RADIUS * 0.65;
+    let fontSize = 14;
+    // Adjust font size for longer text
+    if (initialPrizes[index].displayName.length > 10) {
+        fontSize = 10;
+    }
+
     return {
       x: WHEEL_CENTER + textRadius * Math.cos(angleRad),
       y: WHEEL_CENTER + textRadius * Math.sin(angleRad),
       rotate: segmentAngle * (index + 0.5),
+      fontSize: fontSize,
     };
   };
   
@@ -93,11 +100,12 @@ export function SpinningWheel() {
 
   const determineWinner = () => {
     let random = Math.random();
+    let cumulativeProbability = 0;
     for (const prize of initialPrizes) {
-      if (random < prize.probability) {
+      cumulativeProbability += prize.probability;
+      if (random < cumulativeProbability) {
         return prize;
       }
-      random -= prize.probability;
     }
     // Fallback, should not happen if probabilities sum to 1
     return initialPrizes[initialPrizes.length - 1];
@@ -112,7 +120,7 @@ export function SpinningWheel() {
     const winner = determineWinner();
     const winnerIndex = initialPrizes.findIndex(p => p.id === winner.id);
     
-    const targetAngle = - (winnerIndex * segmentAngle + segmentAngle / 2);
+    const targetAngle = - (winnerIndex * segmentAngle + segmentAngle / 2); // Center of the segment
     const randomSpins = Math.floor(Math.random() * 3) + 3; // 3 to 5 full spins
     const finalRotation = rotation + (360 * randomSpins) + targetAngle - (rotation % 360); 
 
@@ -136,10 +144,10 @@ export function SpinningWheel() {
             title: "You won!",
             description: `You got ${winner.name}!`,
           });
-      } else { // This is for 'no_prize'
+      } else { // This is for 'no_prize' / 'Better Luck Next Time'
          toast({
-            title: "No prize this time.",
-            description: "Better luck next Eid!",
+            title: "Better Luck Next Time!",
+            description: "Don't worry, there's always next Eid!",
             variant: "destructive"
           });
       }
@@ -172,7 +180,7 @@ export function SpinningWheel() {
           >
             <svg viewBox={`0 0 ${WHEEL_SIZE} ${WHEEL_SIZE}`} width={WHEEL_SIZE} height={WHEEL_SIZE}>
               {initialPrizes.map((prize, index) => {
-                const { x: textX, y: textY, rotate: textRotate } = getTextPosition(index);
+                const { x: textX, y: textY, rotate: textRotate, fontSize: textFontSize } = getTextPosition(index);
                 const { x: iconX, y: iconY, rotate: iconRotate } = getIconPosition(index);
                 const IconComponent = prize.icon;
                 return (
@@ -186,7 +194,7 @@ export function SpinningWheel() {
                       y={textY}
                       dy=".3em" // vertical centering
                       textAnchor="middle"
-                      fontSize="14"
+                      fontSize={textFontSize}
                       fontWeight="bold"
                       fill={prize.textColor}
                       transform={`rotate(${textRotate - rotation}, ${textX}, ${textY})`}
@@ -226,3 +234,4 @@ export function SpinningWheel() {
     </Card>
   );
 }
+
