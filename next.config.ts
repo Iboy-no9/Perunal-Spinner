@@ -25,7 +25,13 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'v6xrx50k-3000.inc1.devtunnels.ms', // Added new hostname
+        hostname: 'v6xrx50k-3000.inc1.devtunnels.ms',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.postimg.cc', // Added new hostname
         port: '',
         pathname: '/**',
       }

@@ -22,7 +22,7 @@ export default function LisanIntroPage() {
         <CardContent className="space-y-6">
           <div className="aspect-video w-full relative overflow-hidden rounded-lg shadow-md">
             <Image
-              src="https://v6xrx50k-3000.inc1.devtunnels.ms/images/lisan%20logo%20new.png"
+              src="https://i.postimg.cc/g2Hf85Zw/lisan-logo-new.png"
               alt="Lisan Students Union Logo"
               layout="fill"
               objectFit="contain"
