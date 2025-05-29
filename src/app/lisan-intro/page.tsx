@@ -16,7 +16,7 @@ export default function LisanIntroPage() {
             Lisan - Students Union
           </CardTitle>
           <CardDescription className="text-center text-muted-foreground pt-2">
-            The voice of the students at Darul Irfan.
+            League of Irfan Students' Artistic Nourishment
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -30,9 +30,27 @@ export default function LisanIntroPage() {
               className="rounded-lg"
             />
           </div>
-          <p className="text-muted-foreground text-center px-2">
-            Lisan represents the student body, organizing events, and working to enhance the student experience at Darul Irfan Islamic Academy.
-          </p>
+          <div className="text-muted-foreground text-sm text-justify px-2 leading-relaxed space-y-3">
+            <p>
+              League of Irfan Students' Artistic Nourishment (Lisan), established in 2016, is a vibrant platform
+              for students to nourish the values of Islamic leadership and compassionate service.
+              Rooted in the official constitution, 10 Core Committee members were selected after the
+              yearly election. 6 Working Committees; General Awareness Board (GAB), Language
+              Board, Art Zone, PKV, IT, and state-registered SKSSF run all programs and contests while
+              5 Auxilary Committees; Organizing Council, Marketing Management, Stationary
+              Publishing Burea, and Media Crew stretch their arms to support all activities.
+            </p>
+            <div>
+              <h3 className="font-semibold text-foreground mb-2">Visions:</h3>
+              <ul className="list-disc list-inside space-y-1">
+                <li>To lead the activities of Islamic education and prepare the students for the achievement of Darul Irfan Islamic Academy.</li>
+                <li>To strive for the spiritual, intellectual, artistic, sports, literary, and cultural development of the students.</li>
+                <li>To focus on social service.</li>
+                <li>To publish books, pamphlets, and social media content, etc.</li>
+                <li>To render services to the nation, community, and organization as much as possible.</li>
+              </ul>
+            </div>
+          </div>
         </CardContent>
         <CardFooter className="flex justify-end pt-4">
           <Link href="/spinner" passHref>
