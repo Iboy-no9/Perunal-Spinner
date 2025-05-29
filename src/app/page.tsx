@@ -22,11 +22,11 @@ export default function DarulIrfanIntroPage() {
         <CardContent className="space-y-6">
           <div className="aspect-video w-full relative overflow-hidden rounded-lg shadow-md">
             <Image
-              src="https://placehold.co/600x338.png"
-              alt="Darul Irfan Islamic Academy"
+              src="https://storage.googleapis.com/project-sparky-firebase-testing/temp-assets/darul-irfan-campus.jpg"
+              alt="Darul Irfan Islamic Academy campus with students in assembly"
               layout="fill"
               objectFit="cover"
-              data-ai-hint="college building"
+              data-ai-hint="college campus assembly"
               className="rounded-lg"
             />
           </div>
