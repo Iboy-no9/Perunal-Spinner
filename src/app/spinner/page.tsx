@@ -67,7 +67,7 @@ export default function SpinnerPage() {
             width={windowDimensions.width}
             height={windowDimensions.height}
             recycle={false}
-            numberOfPieces={120} // Adjusted piece count
+            numberOfPieces={200} // Increased piece count
             gravity={0.12}
             colors={[
               'hsl(var(--primary))',      // Theme primary (Green)
@@ -81,7 +81,7 @@ export default function SpinnerPage() {
             width={windowDimensions.width}
             height={windowDimensions.height}
             recycle={false}
-            numberOfPieces={80} // Adjusted piece count
+            numberOfPieces={150} // Increased piece count
             gravity={0.12} 
             drawShape={drawRupeeNoteShape}
             // Colors prop removed as the shape draws its own colors
