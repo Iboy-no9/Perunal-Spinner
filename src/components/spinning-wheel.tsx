@@ -41,8 +41,27 @@ const WHEEL_CENTER = WHEEL_SIZE / 2;
 const WHEEL_RADIUS = WHEEL_SIZE / 2 - 20; // Radius for segments
 const ICON_SIZE = 24;
 const SPIN_DURATION_MS = 5000; // 5 seconds
+
 const LOCAL_STORAGE_KEY_HAS_SPUN = 'perunnalSpinnerHasSpun';
 const LOCAL_STORAGE_KEY_RUPEES_100_WINS = 'perunnalSpinnerRupees100Wins';
+const LOCAL_STORAGE_KEY_TOTAL_RUPEES_CLAIMED = 'perunnalSpinnerTotalRupeesClaimed';
+const TOTAL_RUPEES_LIMIT = 500;
+
+// Helper to get cash value from prize
+const getPrizeCashValue = (prize: Prize | null | undefined): number => {
+  if (!prize) return 0;
+  if (prize.id.endsWith('_rupees')) {
+    const value = parseInt(prize.id.split('_')[0], 10);
+    return isNaN(value) ? 0 : value;
+  }
+  return 0;
+};
+
+const findPrizeById = (id: string): Prize => {
+  const prize = initialPrizes.find(p => p.id === id);
+  // Fallback to 'no_prize' if the target ID is not found, though this should ideally not happen.
+  return prize || initialPrizes.find(p => p.id === 'no_prize')!;
+};
 
 export function SpinningWheel() {
   const [isSpinning, setIsSpinning] = useState(false);
@@ -58,6 +77,14 @@ export function SpinningWheel() {
     const alreadySpun = localStorage.getItem(LOCAL_STORAGE_KEY_HAS_SPUN);
     if (alreadySpun === 'true') {
       setHasSpun(true);
+    }
+    // Initialize total rupees claimed if not present
+    if (!localStorage.getItem(LOCAL_STORAGE_KEY_TOTAL_RUPEES_CLAIMED)) {
+      localStorage.setItem(LOCAL_STORAGE_KEY_TOTAL_RUPEES_CLAIMED, '0');
+    }
+    // Initialize 100 rupees wins if not present
+    if (!localStorage.getItem(LOCAL_STORAGE_KEY_RUPEES_100_WINS)) {
+      localStorage.setItem(LOCAL_STORAGE_KEY_RUPEES_100_WINS, '0');
     }
   }, []);
 
@@ -105,7 +132,7 @@ export function SpinningWheel() {
     };
   };
 
-  const determineWinner = () => {
+  const determineWinner = (): Prize => {
     let random = Math.random();
     let cumulativeProbability = 0;
     for (const prize of initialPrizes) {
@@ -114,7 +141,7 @@ export function SpinningWheel() {
         return prize;
       }
     }
-    return initialPrizes[initialPrizes.length - 1];
+    return initialPrizes[initialPrizes.length - 1]; // Should not happen if probabilities sum to 1
   };
 
   const handleSpin = () => {
@@ -123,56 +150,76 @@ export function SpinningWheel() {
     setIsSpinning(true);
     setCurrentPrize(null);
 
-    let determinedWinner = determineWinner();
-    let actualWinner = determinedWinner; 
+    const determinedWinner = determineWinner();
+    let finalWinner = determinedWinner;
 
-    // Client-side check for ₹100 win limit
-    // Note: This is not a robust global limit. A true global limit requires a backend.
+    // 1. Check ₹100 individual win limit
     if (determinedWinner.id === '100_rupees') {
-      const winCountStr = localStorage.getItem(LOCAL_STORAGE_KEY_RUPEES_100_WINS);
-      let winCount = parseInt(winCountStr || '0', 10);
-      if (isNaN(winCount)) winCount = 0;
-
-      if (winCount < 2) {
-        winCount++;
-        localStorage.setItem(LOCAL_STORAGE_KEY_RUPEES_100_WINS, winCount.toString());
-        // actualWinner remains determinedWinner (i.e., 100_rupees)
-      } else {
-        // Limit reached, change prize to "Better Luck Next Time"
-        const betterLuckPrize = initialPrizes.find(p => p.id === 'no_prize');
-        if (betterLuckPrize) {
-            actualWinner = betterLuckPrize;
-        }
-        // If 'no_prize' somehow isn't found, actualWinner remains determinedWinner,
-        // but this shouldn't happen with the current setup.
+      const rupees100WinsStr = localStorage.getItem(LOCAL_STORAGE_KEY_RUPEES_100_WINS) || '0';
+      const rupees100WinsCount = parseInt(rupees100WinsStr, 10);
+      if (rupees100WinsCount >= 2) {
+        finalWinner = findPrizeById('no_prize');
       }
     }
 
-    const winnerIndex = initialPrizes.findIndex(p => p.id === actualWinner.id);
+    // 2. Check total rupees claimed limit (applies if finalWinner is still a cash prize)
+    const cashValueOfPotentialWinner = getPrizeCashValue(finalWinner);
+    if (cashValueOfPotentialWinner > 0) {
+      const totalRupeesClaimedStr = localStorage.getItem(LOCAL_STORAGE_KEY_TOTAL_RUPEES_CLAIMED) || '0';
+      const currentTotalRupeesClaimed = parseInt(totalRupeesClaimedStr, 10);
+      
+      if (currentTotalRupeesClaimed + cashValueOfPotentialWinner > TOTAL_RUPEES_LIMIT) {
+        finalWinner = findPrizeById('no_prize');
+      }
+    }
+
+    // 3. Update localStorage based on the finalWinner
+    if (finalWinner.id === '100_rupees') { // Means it passed both limits
+      let rupees100WinsCount = parseInt(localStorage.getItem(LOCAL_STORAGE_KEY_RUPEES_100_WINS) || '0', 10);
+      rupees100WinsCount++;
+      localStorage.setItem(LOCAL_STORAGE_KEY_RUPEES_100_WINS, rupees100WinsCount.toString());
+
+      let currentTotalRupeesClaimed = parseInt(localStorage.getItem(LOCAL_STORAGE_KEY_TOTAL_RUPEES_CLAIMED) || '0', 10);
+      currentTotalRupeesClaimed += 100;
+      localStorage.setItem(LOCAL_STORAGE_KEY_TOTAL_RUPEES_CLAIMED, currentTotalRupeesClaimed.toString());
+
+    } else if (getPrizeCashValue(finalWinner) > 0) { // Other cash prize that passed total limit
+      let currentTotalRupeesClaimed = parseInt(localStorage.getItem(LOCAL_STORAGE_KEY_TOTAL_RUPEES_CLAIMED) || '0', 10);
+      currentTotalRupeesClaimed += getPrizeCashValue(finalWinner);
+      localStorage.setItem(LOCAL_STORAGE_KEY_TOTAL_RUPEES_CLAIMED, currentTotalRupeesClaimed.toString());
+    }
+    
+    // Determine final rotation based on finalWinner
+    const winnerIndex = initialPrizes.findIndex(p => p.id === finalWinner.id);
     const targetAngle = - (winnerIndex * segmentAngle + segmentAngle / 2);
     const randomSpins = Math.floor(Math.random() * 3) + 3; 
-    const finalRotation = rotation + (360 * randomSpins) + targetAngle - (rotation % 360);
+    const finalRotationValue = rotation + (360 * randomSpins) + targetAngle - (rotation % 360);
 
-    setRotation(finalRotation);
+    setRotation(finalRotationValue);
 
     setTimeout(() => {
       setIsSpinning(false);
-      setCurrentPrize(actualWinner);
+      setCurrentPrize(finalWinner);
       setHasSpun(true);
       localStorage.setItem(LOCAL_STORAGE_KEY_HAS_SPUN, 'true');
 
-      if (actualWinner.id === '100_rupees') {
+      if (finalWinner.id === '100_rupees') {
          toast({
             title: "🎉 Congratulations! 🎉",
-            description: "You won 100 Rupees!",
+            description: `You won ${finalWinner.name}!`, // Use finalWinner.name
             variant: "default",
           });
-      } else if (actualWinner.id !== 'no_prize') {
+      } else if (finalWinner.id !== 'no_prize' && finalWinner.id !== 'sweets') { // Other cash prizes
          toast({
             title: "You won!",
-            description: `You got ${actualWinner.name}!`,
+            description: `You got ${finalWinner.name}!`,
           });
-      } else {
+      } else if (finalWinner.id === 'sweets') {
+         toast({
+            title: "Sweet!",
+            description: `You got ${finalWinner.name}!`,
+          });
+      } else { // 'no_prize'
          toast({
             title: "Better Luck Next Time!",
             description: "Don't worry, there's always next Eid!",
@@ -186,7 +233,7 @@ export function SpinningWheel() {
     return (
       <Card className="w-full max-w-md mx-auto shadow-2xl bg-card">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold text-primary-foreground">Spin The Wheel!</CardTitle>
+          <CardTitle className="text-3xl font-bold">Spin The Wheel!</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-8 p-6">
           <div
@@ -214,7 +261,7 @@ export function SpinningWheel() {
   return (
     <Card className="w-full max-w-md mx-auto shadow-2xl bg-card">
       <CardHeader className="text-center">
-        <CardTitle className="text-3xl font-bold text-primary-foreground">Spin The Wheel!</CardTitle>
+        <CardTitle className="text-3xl font-bold">Spin The Wheel!</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col items-center gap-8 p-6">
         <div className="relative flex items-center justify-center">
