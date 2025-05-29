@@ -19,7 +19,7 @@ export default function LisanIntroPage() {
             League of Irfan Students' Artistic Nourishment
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 p-0"> {/* Removed default padding and pt-0 is part of p-0 */}
           <div className="aspect-video w-full relative overflow-hidden rounded-lg shadow-md">
             <Image
               src="https://i.postimg.cc/g2Hf85Zw/lisan-logo-new.png"
@@ -30,7 +30,7 @@ export default function LisanIntroPage() {
               className="rounded-lg"
             />
           </div>
-          <div className="text-muted-foreground text-sm text-justify px-2 leading-relaxed space-y-3">
+          <div className="text-muted-foreground text-sm text-justify leading-relaxed space-y-3 px-4 pb-4 md:px-6 md:pb-6"> {/* Added back some padding for text block, removed px-2 */}
             <p>
               League of Irfan Students' Artistic Nourishment (Lisan), established in 2016, is a vibrant platform
               for students to nourish the values of Islamic leadership and compassionate service.
@@ -52,7 +52,7 @@ export default function LisanIntroPage() {
             </div>
           </div>
         </CardContent>
-        <CardFooter className="flex justify-end pt-4">
+        <CardFooter className="flex justify-end pt-4 px-4 pb-4 md:px-6 md:pb-6"> {/* Added some padding to footer for balance */}
           <Link href="/spinner" passHref>
             <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg shadow-md transition-transform transform hover:scale-105 active:scale-95">
               Next <ArrowRight className="ml-2 h-5 w-5" />
@@ -66,3 +66,4 @@ export default function LisanIntroPage() {
     </main>
   );
 }
+
