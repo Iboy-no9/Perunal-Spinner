@@ -34,7 +34,13 @@ export default function Home() {
         />
       )}
       <div className="container mx-auto flex flex-col items-center gap-8">
-        <h1 className="text-5xl md:text-6xl font-extrabold text-center" style={{ color: "hsl(var(--accent))" }}>
+        <h1 
+          className="text-5xl md:text-6xl font-extrabold text-center" 
+          style={{ 
+            color: "hsl(var(--accent))",
+            fontFamily: "var(--font-baloo-chettan-2), var(--font-geist-sans)" 
+          }}
+        >
           പെരുന്നാൾ പൈസ
         </h1>
         <p className="text-lg text-center text-muted-foreground max-w-xl">

@@ -1,5 +1,5 @@
 import type {Metadata} from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Geist, Geist_Mono, Baloo_Chettan_2 } from 'next/font/google';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
@@ -11,6 +11,13 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
+});
+
+const balooChettan2 = Baloo_Chettan_2({
+  variable: '--font-baloo-chettan-2',
+  subsets: ['malayalam', 'latin'],
+  weight: ['800'], // For font-extrabold used in the title
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -25,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${balooChettan2.variable} antialiased`}>
         {children}
         <Toaster />
       </body>
