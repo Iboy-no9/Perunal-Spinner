@@ -20,11 +20,11 @@ interface Prize {
 }
 
 const initialPrizes: Prize[] = [
-  { id: 'sweets', name: 'Sweets', displayName: 'Sweets', icon: Gift, probability: 0.225, color: 'hsl(320, 70%, 75%)', textColor: 'hsl(0, 0%, 10%)' },
-  { id: '100_rupees', name: '100 Rupees', displayName: '₹100', icon: Award, probability: 0.10, color: 'hsl(51, 100%, 60%)', textColor: 'hsl(0, 0%, 10%)' },
-  { id: '20_rupees', name: '20 Rupees', displayName: '₹20', icon: Gem, probability: 0.225, color: 'hsl(190, 70%, 70%)', textColor: 'hsl(0, 0%, 10%)' },
-  { id: '50_rupees', name: '50 Rupees', displayName: '₹50', icon: Star, probability: 0.225, color: 'hsl(140, 60%, 65%)', textColor: 'hsl(0, 0%, 10%)' },
-  { id: 'no_prize', name: 'Better Luck Next Time', displayName: 'Better Luck Next Time', icon: Frown, probability: 0.225, color: 'hsl(220, 15%, 70%)', textColor: 'hsl(0, 0%, 10%)' }, // Changed icon to Frown
+  { id: 'sweets', name: 'Sweets', displayName: 'Sweets', icon: Gift, probability: 0.2475, color: 'hsl(320, 70%, 75%)', textColor: 'hsl(0, 0%, 10%)' },
+  { id: '100_rupees', name: '100 Rupees', displayName: '₹100', icon: Award, probability: 0.01, color: 'hsl(51, 100%, 60%)', textColor: 'hsl(0, 0%, 10%)' },
+  { id: '20_rupees', name: '20 Rupees', displayName: '₹20', icon: Gem, probability: 0.2475, color: 'hsl(190, 70%, 70%)', textColor: 'hsl(0, 0%, 10%)' },
+  { id: '50_rupees', name: '50 Rupees', displayName: '₹50', icon: Star, probability: 0.2475, color: 'hsl(140, 60%, 65%)', textColor: 'hsl(0, 0%, 10%)' },
+  { id: 'no_prize', name: 'Better Luck Next Time', displayName: 'Better Luck Next Time', icon: Frown, probability: 0.2475, color: 'hsl(220, 15%, 70%)', textColor: 'hsl(0, 0%, 10%)' },
 ];
 
 const WHEEL_SIZE = 360; // SVG viewBox size
@@ -237,3 +237,5 @@ export function SpinningWheel() {
     </Card>
   );
 }
+
+    
