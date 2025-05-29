@@ -2,7 +2,7 @@
 "use client";
 
 import type { LucideIcon } from "lucide-react";
-import { Award, Gem, Gift, Star, Frown, Triangle } from "lucide-react"; // Changed XCircle to Frown
+import { Award, Gem, Gift, Star, ThumbsUp, Coins, Triangle } from "lucide-react"; // Added ThumbsUp, Coins
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,11 +20,12 @@ interface Prize {
 }
 
 const initialPrizes: Prize[] = [
-  { id: 'sweets', name: 'Sweets', displayName: 'Sweets', icon: Gift, probability: 0.2475, color: 'hsl(320, 70%, 75%)', textColor: 'hsl(0, 0%, 10%)' },
+  { id: 'sweets', name: 'Sweets', displayName: 'Sweets', icon: Gift, probability: 0.198, color: 'hsl(320, 70%, 75%)', textColor: 'hsl(0, 0%, 10%)' },
   { id: '100_rupees', name: '100 Rupees', displayName: '₹100', icon: Award, probability: 0.01, color: 'hsl(51, 100%, 60%)', textColor: 'hsl(0, 0%, 10%)' },
-  { id: '20_rupees', name: '20 Rupees', displayName: '₹20', icon: Gem, probability: 0.2475, color: 'hsl(190, 70%, 70%)', textColor: 'hsl(0, 0%, 10%)' },
-  { id: '50_rupees', name: '50 Rupees', displayName: '₹50', icon: Star, probability: 0.2475, color: 'hsl(140, 60%, 65%)', textColor: 'hsl(0, 0%, 10%)' },
-  { id: 'no_prize', name: 'Better Luck Next Time', displayName: 'Better Luck Next Time', icon: Frown, probability: 0.2475, color: 'hsl(220, 15%, 70%)', textColor: 'hsl(0, 0%, 10%)' },
+  { id: '20_rupees', name: '20 Rupees', displayName: '₹20', icon: Gem, probability: 0.198, color: 'hsl(190, 70%, 70%)', textColor: 'hsl(0, 0%, 10%)' },
+  { id: '50_rupees', name: '50 Rupees', displayName: '₹50', icon: Star, probability: 0.198, color: 'hsl(140, 60%, 65%)', textColor: 'hsl(0, 0%, 10%)' },
+  { id: '10_rupees', name: '10 Rupees', displayName: '₹10', icon: Coins, probability: 0.198, color: 'hsl(210, 70%, 75%)', textColor: 'hsl(0, 0%, 10%)' },
+  { id: 'no_prize', name: 'Better Luck Next Time', displayName: 'Better Luck Next Time', icon: ThumbsUp, probability: 0.198, color: 'hsl(220, 15%, 70%)', textColor: 'hsl(0, 0%, 10%)' },
 ];
 
 const WHEEL_SIZE = 360; // SVG viewBox size
@@ -45,12 +46,6 @@ export function SpinningWheel() {
     const alreadySpun = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (alreadySpun === 'true') {
       setHasSpun(true);
-      // Optionally, retrieve and set the last prize won if desired
-      // const lastPrizeId = localStorage.getItem('perunnalSpinnerLastPrize');
-      // if (lastPrizeId) {
-      //   const prize = initialPrizes.find(p => p.id === lastPrizeId);
-      //   if (prize) setCurrentPrize(prize);
-      // }
     }
   }, []);
 
@@ -77,7 +72,7 @@ export function SpinningWheel() {
     let fontSize = 14;
     // Adjust font size for longer text, especially "Better Luck Next Time"
     if (initialPrizes[index].id === 'no_prize') {
-        fontSize = 9; // Made it smaller for "Better Luck Next Time"
+        fontSize = 9; 
     } else if (initialPrizes[index].displayName.length > 10) {
         fontSize = 10;
     }
@@ -134,7 +129,6 @@ export function SpinningWheel() {
       setCurrentPrize(winner);
       setHasSpun(true);
       localStorage.setItem(LOCAL_STORAGE_KEY, 'true');
-      // localStorage.setItem('perunnalSpinnerLastPrize', winner.id); // Optionally store last prize
 
       if (winner.id === '100_rupees') {
          toast({
@@ -151,7 +145,7 @@ export function SpinningWheel() {
          toast({
             title: "Better Luck Next Time!",
             description: "Don't worry, there's always next Eid!",
-            variant: "destructive"
+            variant: "destructive" // Keep as destructive or change if ThumbsUp implies otherwise
           });
       }
     }, SPIN_DURATION_MS);
@@ -237,5 +231,3 @@ export function SpinningWheel() {
     </Card>
   );
 }
-
-    
