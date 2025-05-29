@@ -24,7 +24,7 @@ const initialPrizes: Prize[] = [
   { id: '100_rupees', name: '100 Rupees', displayName: '₹100', icon: Award, probability: 0.10, color: 'hsl(51, 100%, 60%)', textColor: 'hsl(0, 0%, 10%)' },
   { id: '20_rupees', name: '20 Rupees', displayName: '₹20', icon: Gem, probability: 0.225, color: 'hsl(190, 70%, 70%)', textColor: 'hsl(0, 0%, 10%)' },
   { id: '50_rupees', name: '50 Rupees', displayName: '₹50', icon: Star, probability: 0.225, color: 'hsl(140, 60%, 65%)', textColor: 'hsl(0, 0%, 10%)' },
-  { id: 'better_luck', name: 'Better Luck Next Time', displayName: 'Try Again', icon: XCircle, probability: 0.225, color: 'hsl(220, 15%, 70%)', textColor: 'hsl(0, 0%, 10%)' },
+  { id: 'no_prize', name: 'No Prize', displayName: 'No Prize', icon: XCircle, probability: 0.225, color: 'hsl(220, 15%, 70%)', textColor: 'hsl(0, 0%, 10%)' },
 ];
 
 const WHEEL_SIZE = 360; // SVG viewBox size
@@ -32,13 +32,27 @@ const WHEEL_CENTER = WHEEL_SIZE / 2;
 const WHEEL_RADIUS = WHEEL_SIZE / 2 - 20; // Radius for segments
 const ICON_SIZE = 24;
 const SPIN_DURATION_MS = 5000; // 5 seconds
+const LOCAL_STORAGE_KEY = 'perunnalSpinnerHasSpun';
 
 export function SpinningWheel() {
   const [isSpinning, setIsSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
   const [currentPrize, setCurrentPrize] = useState<Prize | null>(null);
-  const [rupees100Wins, setRupees100Wins] = useState(0);
+  const [hasSpun, setHasSpun] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const alreadySpun = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (alreadySpun === 'true') {
+      setHasSpun(true);
+      // Optionally, retrieve and set the last prize won if desired
+      // const lastPrizeId = localStorage.getItem('perunnalSpinnerLastPrize');
+      // if (lastPrizeId) {
+      //   const prize = initialPrizes.find(p => p.id === lastPrizeId);
+      //   if (prize) setCurrentPrize(prize);
+      // }
+    }
+  }, []);
 
   const numSegments = initialPrizes.length;
   const segmentAngle = 360 / numSegments;
@@ -77,89 +91,55 @@ export function SpinningWheel() {
     };
   };
 
-
   const determineWinner = () => {
-    let prizesToConsider = [...initialPrizes];
-    if (rupees100Wins >= 2) {
-      const totalProbExcluding100 = prizesToConsider
-        .filter(p => p.id !== '100_rupees')
-        .reduce((sum, p) => sum + p.probability, 0);
-
-      prizesToConsider = prizesToConsider.map(p => {
-        if (p.id === '100_rupees') {
-          return { ...p, probability: 0 };
-        }
-        // Redistribute probability
-        return { ...p, probability: p.probability / totalProbExcluding100 * (totalProbExcluding100 + (initialPrizes.find(ip => ip.id === '100_rupees')?.probability || 0)) };
-      });
-      // Normalize probabilities in case of floating point issues
-      const sumProb = prizesToConsider.reduce((s, p) => s + p.probability, 0);
-      if (sumProb !== 0) { // Avoid division by zero if all probabilities become zero
-         prizesToConsider = prizesToConsider.map(p => ({ ...p, probability: p.probability / sumProb }));
-      }
-    }
-    
     let random = Math.random();
-    for (const prize of prizesToConsider) {
+    for (const prize of initialPrizes) {
       if (random < prize.probability) {
         return prize;
       }
       random -= prize.probability;
     }
     // Fallback, should not happen if probabilities sum to 1
-    return prizesToConsider[prizesToConsider.length - 1];
+    return initialPrizes[initialPrizes.length - 1];
   };
 
   const handleSpin = () => {
-    if (isSpinning) return;
+    if (isSpinning || hasSpun) return;
 
     setIsSpinning(true);
     setCurrentPrize(null);
 
     const winner = determineWinner();
     const winnerIndex = initialPrizes.findIndex(p => p.id === winner.id);
-
-    // Calculate rotation: target segment's middle should align with pointer (top: 0 deg for the element)
-    // Each segment is segmentAngle deg. Middle of segment i is (i + 0.5) * segmentAngle.
-    // Pointer is at 0 deg. We want to rotate so -(winner_segment_mid_angle) is at 0.
-    // Or, target angle for wheel element to rotate by is such that winner segment is at top.
-    const targetAngle = - (winnerIndex * segmentAngle + segmentAngle / 2);
     
+    const targetAngle = - (winnerIndex * segmentAngle + segmentAngle / 2);
     const randomSpins = Math.floor(Math.random() * 3) + 3; // 3 to 5 full spins
-    const finalRotation = rotation + (360 * randomSpins) + targetAngle - (rotation % 360); // Ensures smooth continuation
+    const finalRotation = rotation + (360 * randomSpins) + targetAngle - (rotation % 360); 
 
     setRotation(finalRotation);
 
     setTimeout(() => {
       setIsSpinning(false);
       setCurrentPrize(winner);
+      setHasSpun(true);
+      localStorage.setItem(LOCAL_STORAGE_KEY, 'true');
+      // localStorage.setItem('perunnalSpinnerLastPrize', winner.id); // Optionally store last prize
+
       if (winner.id === '100_rupees') {
-        const newWins = rupees100Wins + 1;
-        setRupees100Wins(newWins);
-        if (newWins <= 2) {
-             toast({
-                title: "🎉 Congratulations! 🎉",
-                description: "You won 100 Rupees!",
-                variant: "default",
-              });
-        } else {
-            // This case should be handled by determineWinner redirecting to another prize if limit is reached
-            // but as a fallback message:
-             toast({
-                title: "Almost!",
-                description: "You landed on 100 Rupees, but the limit was reached. Better luck next time!",
-                variant: "default",
-              });
-        }
-      } else if (winner.id !== 'better_luck') {
+         toast({
+            title: "🎉 Congratulations! 🎉",
+            description: "You won 100 Rupees!",
+            variant: "default",
+          });
+      } else if (winner.id !== 'no_prize') {
          toast({
             title: "You won!",
             description: `You got ${winner.name}!`,
           });
-      } else {
+      } else { // This is for 'no_prize'
          toast({
-            title: "Better luck next time!",
-            description: "Keep trying!",
+            title: "No prize this time.",
+            description: "Better luck next Eid!",
             variant: "destructive"
           });
       }
@@ -186,7 +166,7 @@ export function SpinningWheel() {
               height: `${WHEEL_SIZE}px`,
               transform: `rotate(${rotation}deg)`,
               transition: isSpinning ? `transform ${SPIN_DURATION_MS / 1000}s cubic-bezier(0.25, 0.1, 0.25, 1)` : 'none',
-              border: '8px solid hsl(var(--primary))', // Festive gold border
+              border: '8px solid hsl(var(--primary))', 
               boxShadow: '0 0 20px hsl(var(--primary)/0.5), inset 0 0 15px hsl(var(--background)/0.7)',
             }}
           >
@@ -223,11 +203,11 @@ export function SpinningWheel() {
 
         <Button
           onClick={handleSpin}
-          disabled={isSpinning || (currentPrize?.id === '100_rupees' && rupees100Wins >=2 && initialPrizes.filter(p => p.id !== '100_rupees' || p.probability > 0).length === 1 && initialPrizes.find(p => p.id === 'better_luck')?.probability === 1)}
+          disabled={isSpinning || hasSpun}
           className="w-full max-w-xs py-3 text-lg font-semibold rounded-lg shadow-md bg-accent hover:bg-accent/90 text-accent-foreground transition-all duration-150 ease-in-out transform active:scale-95"
-          aria-label="Spin the wheel"
+          aria-label={hasSpun ? "You have already played" : "Spin the wheel"}
         >
-          {isSpinning ? "Spinning..." : "SPIN!"}
+          {isSpinning ? "Spinning..." : hasSpun ? "Thanks for playing!" : "SPIN!"}
         </Button>
 
         {currentPrize && !isSpinning && (
@@ -235,16 +215,13 @@ export function SpinningWheel() {
             <p className="text-xl font-semibold text-secondary-foreground">
               You landed on: <span className="text-primary">{currentPrize.name}</span>
             </p>
-            {currentPrize.id === '100_rupees' && rupees100Wins >= 2 && (
-              <p className="text-sm text-muted-foreground mt-1">
-                (100 Rupees prize limit reached)
-              </p>
-            )}
           </div>
         )}
-         <p className="text-sm text-muted-foreground text-center">
-            100 Rupees wins: {rupees100Wins} / 2
-         </p>
+         {hasSpun && !isSpinning && (
+            <p className="text-sm text-muted-foreground text-center">
+                You've had your spin for this Perunnal! Come back next Eid!
+            </p>
+         )}
       </CardContent>
     </Card>
   );
