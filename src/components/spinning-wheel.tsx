@@ -2,7 +2,7 @@
 "use client";
 
 import type { LucideIcon } from "lucide-react";
-import { Award, Gem, Gift, Star, ThumbsUp, Coins, Triangle } from "lucide-react"; // Added ThumbsUp, Coins
+import { Award, Gem, Gift, Star, ThumbsUp, Coins, Triangle, Frown } from "lucide-react"; // Added ThumbsUp, Coins, Frown
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,9 +40,12 @@ export function SpinningWheel() {
   const [rotation, setRotation] = useState(0);
   const [currentPrize, setCurrentPrize] = useState<Prize | null>(null);
   const [hasSpun, setHasSpun] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false); // For hydration fix
   const { toast } = useToast();
 
   useEffect(() => {
+    setHasMounted(true); // Component has mounted on client
+
     const alreadySpun = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (alreadySpun === 'true') {
       setHasSpun(true);
@@ -72,7 +75,7 @@ export function SpinningWheel() {
     let fontSize = 14;
     // Adjust font size for longer text, especially "Better Luck Next Time"
     if (initialPrizes[index].id === 'no_prize') {
-        fontSize = 9; 
+        fontSize = 9;
     } else if (initialPrizes[index].displayName.length > 10) {
         fontSize = 10;
     }
@@ -85,7 +88,7 @@ export function SpinningWheel() {
       fontSize: fontSize,
     };
   };
-  
+
   const getIconPosition = (index: number) => {
     const angleRad = (segmentAngle * (index + 0.5) - 90) * (Math.PI / 180);
     const iconRadius = WHEEL_RADIUS * 0.85; // Position icons closer to the edge
@@ -117,10 +120,10 @@ export function SpinningWheel() {
 
     const winner = determineWinner();
     const winnerIndex = initialPrizes.findIndex(p => p.id === winner.id);
-    
+
     const targetAngle = - (winnerIndex * segmentAngle + segmentAngle / 2); // Center of the segment
     const randomSpins = Math.floor(Math.random() * 3) + 3; // 3 to 5 full spins
-    const finalRotation = rotation + (360 * randomSpins) + targetAngle - (rotation % 360); 
+    const finalRotation = rotation + (360 * randomSpins) + targetAngle - (rotation % 360);
 
     setRotation(finalRotation);
 
@@ -141,16 +144,46 @@ export function SpinningWheel() {
             title: "You won!",
             description: `You got ${winner.name}!`,
           });
-      } else { // This is for 'no_prize' / 'Better Luck Next Time'
+      } else {
          toast({
             title: "Better Luck Next Time!",
             description: "Don't worry, there's always next Eid!",
-            variant: "destructive" // Keep as destructive or change if ThumbsUp implies otherwise
+            variant: "destructive"
           });
       }
     }, SPIN_DURATION_MS);
   };
-  
+
+  if (!hasMounted) {
+    // Render a simple placeholder to avoid SVG rendering on server/pre-hydration
+    return (
+      <Card className="w-full max-w-md mx-auto shadow-2xl bg-card">
+        <CardHeader className="text-center">
+          <CardTitle className="text-3xl font-bold text-primary-foreground">Spin The Wheel!</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col items-center gap-8 p-6">
+          <div
+            className="rounded-full shadow-xl flex items-center justify-center"
+            style={{
+              width: `${WHEEL_SIZE}px`,
+              height: `${WHEEL_SIZE}px`,
+              border: '8px solid hsl(var(--primary))',
+              backgroundColor: 'hsl(var(--muted))', // Use a muted background for placeholder
+            }}
+          >
+            <p className="text-muted-foreground">Loading Wheel...</p>
+          </div>
+          <Button
+            disabled
+            className="w-full max-w-xs py-3 text-lg font-semibold rounded-lg shadow-md bg-accent hover:bg-accent/90 text-accent-foreground transition-all duration-150 ease-in-out transform active:scale-95"
+          >
+            Loading...
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="w-full max-w-md mx-auto shadow-2xl bg-card">
       <CardHeader className="text-center">
@@ -171,7 +204,7 @@ export function SpinningWheel() {
               height: `${WHEEL_SIZE}px`,
               transform: `rotate(${rotation}deg)`,
               transition: isSpinning ? `transform ${SPIN_DURATION_MS / 1000}s cubic-bezier(0.25, 0.1, 0.25, 1)` : 'none',
-              border: '8px solid hsl(var(--primary))', 
+              border: '8px solid hsl(var(--primary))',
               boxShadow: '0 0 20px hsl(var(--primary)/0.5), inset 0 0 15px hsl(var(--background)/0.7)',
             }}
           >
