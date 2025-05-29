@@ -1,5 +1,5 @@
 import type {Metadata} from 'next';
-import { Geist, Geist_Mono, Baloo_Chettan_2 } from 'next/font/google';
+import { Geist, Geist_Mono, Chilanka } from 'next/font/google';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
@@ -13,10 +13,10 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
-const balooChettan2 = Baloo_Chettan_2({
-  variable: '--font-baloo-chettan-2',
+const chilanka = Chilanka({
+  variable: '--font-chilanka',
   subsets: ['malayalam', 'latin'],
-  weight: ['800'], // For font-extrabold used in the title
+  weight: ['400'], // Chilanka typically comes in regular weight
   display: 'swap',
 });
 
@@ -32,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} ${balooChettan2.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} ${chilanka.variable} antialiased`}>
         {children}
         <Toaster />
       </body>

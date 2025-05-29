@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import Confetti from 'react-confetti';
 import { SpinningWheel } from "@/components/spinning-wheel";
 
-export default function SpinnerPage() { // Renamed component
+export default function SpinnerPage() { 
   const [windowDimensions, setWindowDimensions] = useState({ width: 0, height: 0 });
   const [isRunningConfetti, setIsRunningConfetti] = useState(true);
 
@@ -38,7 +38,7 @@ export default function SpinnerPage() { // Renamed component
           className="text-5xl md:text-6xl font-extrabold text-center" 
           style={{ 
             color: "hsl(var(--accent))",
-            fontFamily: "var(--font-baloo-chettan-2), var(--font-geist-sans)" 
+            fontFamily: "var(--font-chilanka), var(--font-geist-sans)" 
           }}
         >
           പെരുന്നാൾ പൈസ
