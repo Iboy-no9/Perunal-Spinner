@@ -37,7 +37,7 @@ export default function SpinnerPage() {
         <h1 
           className="text-5xl md:text-6xl font-extrabold text-center" 
           style={{ 
-            color: "hsl(var(--accent))",
+            color: "#4a5b63",
             fontFamily: "var(--font-chilanka), var(--font-geist-sans)" 
           }}
         >
