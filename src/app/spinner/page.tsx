@@ -5,19 +5,36 @@ import React, { useState, useEffect } from 'react';
 import Confetti from 'react-confetti';
 import { SpinningWheel } from "@/components/spinning-wheel";
 
-// Define the custom draw function for Rupee symbols outside the component
-const drawRupeeShape = (ctx: CanvasRenderingContext2D) => {
-  const rupee = '₹';
-  const fontSize = 24; // Increased font size for better visibility
-  // Use Chilanka font as it's in the project and supports the Rupee symbol
-  ctx.font = `bold ${fontSize}px Chilanka, sans-serif`; 
+// Define the custom draw function for Rupee note shapes outside the component
+const drawRupeeNoteShape = (ctx: CanvasRenderingContext2D) => {
+  const noteWidth = 30; // Width of the note confetti
+  const noteHeight = 18; // Height of the note confetti (maintaining a bill-like aspect ratio)
+  const rupeeSymbol = '₹';
+  const symbolFontSize = 10; // Font size for the rupee symbol on the note
+
+  // Note coordinates (shape is drawn centered at 0,0 for the particle)
+  const noteX = -noteWidth / 2;
+  const noteY = -noteHeight / 2;
+
+  // Draw note background (e.g., a light green often associated with currency)
+  ctx.fillStyle = '#A8E6A0'; // A light, slightly muted green
+  ctx.fillRect(noteX, noteY, noteWidth, noteHeight);
   
-  // Measure text for centering
-  const textMetrics = ctx.measureText(rupee);
-  // Approximate vertical centering. Adjust if needed.
-  // Using actualBoundingBoxAscent for more precise vertical positioning from baseline
-  const yOffset = textMetrics.actualBoundingBoxAscent / 2; 
-  ctx.fillText(rupee, -textMetrics.width / 2, yOffset);
+  // Optional: Draw a simple border for the note
+  ctx.strokeStyle = '#5C8D56'; // A darker green for border
+  ctx.lineWidth = 0.5; // Thin border
+  ctx.strokeRect(noteX, noteY, noteWidth, noteHeight);
+
+  // Draw rupee symbol on the note
+  // Use Chilanka font as it's in the project and supports the Rupee symbol
+  ctx.font = `bold ${symbolFontSize}px Chilanka, sans-serif`;
+  ctx.fillStyle = '#333333'; // Dark grey for the symbol for good contrast
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  
+  // Position the symbol in the center of the note shape
+  // Since the rectangle is drawn centered at (0,0), the text is also centered at (0,0)
+  ctx.fillText(rupeeSymbol, 0, 0); 
 };
 
 export default function SpinnerPage() { 
@@ -45,9 +62,8 @@ export default function SpinnerPage() {
             width={windowDimensions.width}
             height={windowDimensions.height}
             recycle={false}
-            numberOfPieces={150} // Adjust as needed
+            numberOfPieces={120} // Adjusted piece count
             gravity={0.12}
-            onConfettiComplete={() => setIsRunningConfetti(false)} // Stop when this batch completes
             colors={[
               'hsl(var(--primary))',      // Theme primary (Green)
               'hsl(var(--accent))',       // Theme accent (Deep Ruby Red)
@@ -55,19 +71,16 @@ export default function SpinnerPage() {
               'hsl(190, 70%, 70%)',   // Light Blue (from ₹20 prize)
             ]}
           />
-          {/* Rupee Symbol Confetti */}
+          {/* Rupee Note Symbol Confetti */}
           <Confetti
             width={windowDimensions.width}
             height={windowDimensions.height}
             recycle={false}
-            numberOfPieces={100} // Adjust as needed
-            gravity={0.12} // Slightly different gravity for variation if desired, or keep same
-            drawShape={drawRupeeShape}
-            colors={[
-                '#FFD700', // Gold
-                '#4CAF50', // Green (like Indian currency)
-                '#C0C0C0', // Silver
-            ]}
+            numberOfPieces={80} // Adjusted piece count
+            gravity={0.12} 
+            drawShape={drawRupeeNoteShape}
+            // Colors prop removed as the shape draws its own colors
+            onConfettiComplete={!isRunningConfetti ? undefined : () => setIsRunningConfetti(false)} // Stop when this batch completes
           />
         </>
       )}
