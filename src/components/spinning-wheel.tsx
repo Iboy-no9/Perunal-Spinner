@@ -2,7 +2,7 @@
 "use client";
 
 import type { LucideIcon } from "lucide-react";
-import { Award, Gem, Gift, Star, XCircle, Triangle } from "lucide-react";
+import { Award, Gem, Gift, Star, Frown, Triangle } from "lucide-react"; // Changed XCircle to Frown
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,7 +24,7 @@ const initialPrizes: Prize[] = [
   { id: '100_rupees', name: '100 Rupees', displayName: '₹100', icon: Award, probability: 0.10, color: 'hsl(51, 100%, 60%)', textColor: 'hsl(0, 0%, 10%)' },
   { id: '20_rupees', name: '20 Rupees', displayName: '₹20', icon: Gem, probability: 0.225, color: 'hsl(190, 70%, 70%)', textColor: 'hsl(0, 0%, 10%)' },
   { id: '50_rupees', name: '50 Rupees', displayName: '₹50', icon: Star, probability: 0.225, color: 'hsl(140, 60%, 65%)', textColor: 'hsl(0, 0%, 10%)' },
-  { id: 'no_prize', name: 'Better Luck Next Time', displayName: 'Better Luck Next Time', icon: XCircle, probability: 0.225, color: 'hsl(220, 15%, 70%)', textColor: 'hsl(0, 0%, 10%)' },
+  { id: 'no_prize', name: 'Better Luck Next Time', displayName: 'Better Luck Next Time', icon: Frown, probability: 0.225, color: 'hsl(220, 15%, 70%)', textColor: 'hsl(0, 0%, 10%)' }, // Changed icon to Frown
 ];
 
 const WHEEL_SIZE = 360; // SVG viewBox size
@@ -75,10 +75,13 @@ export function SpinningWheel() {
     const angleRad = (segmentAngle * (index + 0.5) - 90) * (Math.PI / 180);
     const textRadius = WHEEL_RADIUS * 0.65;
     let fontSize = 14;
-    // Adjust font size for longer text
-    if (initialPrizes[index].displayName.length > 10) {
+    // Adjust font size for longer text, especially "Better Luck Next Time"
+    if (initialPrizes[index].id === 'no_prize') {
+        fontSize = 9; // Made it smaller for "Better Luck Next Time"
+    } else if (initialPrizes[index].displayName.length > 10) {
         fontSize = 10;
     }
+
 
     return {
       x: WHEEL_CENTER + textRadius * Math.cos(angleRad),
@@ -234,4 +237,3 @@ export function SpinningWheel() {
     </Card>
   );
 }
-
