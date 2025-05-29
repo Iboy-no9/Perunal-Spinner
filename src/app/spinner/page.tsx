@@ -5,12 +5,18 @@ import React, { useState, useEffect } from 'react';
 import Confetti from 'react-confetti';
 import { SpinningWheel } from "@/components/spinning-wheel";
 
+// Define the list of denominations for the note confetti
+const denominations = ['₹10', '₹20', '₹50', '₹100', '₹'];
+
 // Define the custom draw function for Rupee note shapes outside the component
 const drawRupeeNoteShape = (ctx: CanvasRenderingContext2D) => {
   const noteWidth = 30; // Width of the note confetti
   const noteHeight = 18; // Height of the note confetti (maintaining a bill-like aspect ratio)
-  const rupeeSymbol = '₹';
-  const symbolFontSize = 10; // Font size for the rupee symbol on the note
+  
+  // Randomly pick a denomination for this particle
+  const denominationText = denominations[Math.floor(Math.random() * denominations.length)];
+  // Adjust font size based on text length
+  const symbolFontSize = denominationText.length > 3 ? 8 : 10; 
 
   // Note coordinates (shape is drawn centered at 0,0 for the particle)
   const noteX = -noteWidth / 2;
@@ -25,16 +31,15 @@ const drawRupeeNoteShape = (ctx: CanvasRenderingContext2D) => {
   ctx.lineWidth = 0.5; // Thin border
   ctx.strokeRect(noteX, noteY, noteWidth, noteHeight);
 
-  // Draw rupee symbol on the note
-  // Use Chilanka font as it's in the project and supports the Rupee symbol
+  // Draw chosen denomination text on the note
+  // Use Chilanka font as it's in the project and supports the Rupee symbol & numerals
   ctx.font = `bold ${symbolFontSize}px Chilanka, sans-serif`;
-  ctx.fillStyle = '#333333'; // Dark grey for the symbol for good contrast
+  ctx.fillStyle = '#333333'; // Dark grey for the text for good contrast
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   
-  // Position the symbol in the center of the note shape
-  // Since the rectangle is drawn centered at (0,0), the text is also centered at (0,0)
-  ctx.fillText(rupeeSymbol, 0, 0); 
+  // Position the text in the center of the note shape
+  ctx.fillText(denominationText, 0, 0); 
 };
 
 export default function SpinnerPage() { 
