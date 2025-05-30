@@ -19,21 +19,21 @@ interface Prize {
   textColor: string; // HSL string for text fill
 }
 
-// Probabilities:
-// Sweets: 0.30
-// ₹100: 0.10
-// ₹20: 0.05
-// ₹50: 0.05
-// ₹10: 0.10
-// Better Luck Next Time: 0.40
+// New Probabilities:
+// Sweets: 0.25
+// ₹100: 0.05
+// ₹20: 0.10
+// ₹50: 0.10
+// ₹10: 0.20
+// Better Luck Next Time: 0.30
 // Total: 1.00
 const initialPrizes: Prize[] = [
-  { id: 'sweets', name: 'Sweets', displayName: 'Sweets', icon: Gift, probability: 0.30, color: 'hsl(320, 70%, 75%)', textColor: 'hsl(0, 0%, 10%)' },
-  { id: '100_rupees', name: '100 Rupees', displayName: '₹100', icon: Award, probability: 0.10, color: 'hsl(51, 100%, 60%)', textColor: 'hsl(0, 0%, 10%)' },
-  { id: '20_rupees', name: '20 Rupees', displayName: '₹20', icon: Gem, probability: 0.05, color: 'hsl(190, 70%, 70%)', textColor: 'hsl(0, 0%, 10%)' },
-  { id: '50_rupees', name: '50 Rupees', displayName: '₹50', icon: Star, probability: 0.05, color: 'hsl(140, 60%, 65%)', textColor: 'hsl(0, 0%, 10%)' },
-  { id: '10_rupees', name: '10 Rupees', displayName: '₹10', icon: Coins, probability: 0.10, color: 'hsl(210, 70%, 75%)', textColor: 'hsl(0, 0%, 10%)' },
-  { id: 'no_prize', name: 'Better Luck Next Time', displayName: 'Better Luck Next Time', icon: ThumbsUp, probability: 0.40, color: 'hsl(220, 15%, 70%)', textColor: 'hsl(0, 0%, 10%)' },
+  { id: 'sweets', name: 'Sweets', displayName: 'Sweets', icon: Gift, probability: 0.25, color: 'hsl(320, 70%, 75%)', textColor: 'hsl(0, 0%, 10%)' },
+  { id: '100_rupees', name: '100 Rupees', displayName: '₹100', icon: Award, probability: 0.05, color: 'hsl(51, 100%, 60%)', textColor: 'hsl(0, 0%, 10%)' },
+  { id: '20_rupees', name: '20 Rupees', displayName: '₹20', icon: Gem, probability: 0.10, color: 'hsl(190, 70%, 70%)', textColor: 'hsl(0, 0%, 10%)' },
+  { id: '50_rupees', name: '50 Rupees', displayName: '₹50', icon: Star, probability: 0.10, color: 'hsl(140, 60%, 65%)', textColor: 'hsl(0, 0%, 10%)' },
+  { id: '10_rupees', name: '10 Rupees', displayName: '₹10', icon: Coins, probability: 0.20, color: 'hsl(210, 70%, 75%)', textColor: 'hsl(0, 0%, 10%)' },
+  { id: 'no_prize', name: 'Better Luck Next Time', displayName: 'Better Luck Next Time', icon: ThumbsUp, probability: 0.30, color: 'hsl(220, 15%, 70%)', textColor: 'hsl(0, 0%, 10%)' },
 ];
 
 const WHEEL_SIZE = 360; // SVG viewBox size
@@ -338,3 +338,4 @@ export function SpinningWheel() {
     </Card>
   );
 }
+
